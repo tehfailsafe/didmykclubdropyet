@@ -15,7 +15,7 @@ const client = createClient({
 
 export const meta: MetaFunction = () => ({
     charset: "utf-8",
-    title: "New Remix App",
+    title: "DidMykClubDropYet?",
     viewport: "width=device-width,initial-scale=1",
 });
 
