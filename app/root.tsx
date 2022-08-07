@@ -15,7 +15,7 @@ const client = createClient({
 
 export const meta: MetaFunction = () => ({
     charset: "utf-8",
-    title: "DidMykClubDropYet?",
+    title: "Did My kClub Drop Yet?",
     viewport: "width=device-width,initial-scale=1",
 });
 
