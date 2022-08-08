@@ -1,17 +1,18 @@
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
-import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
-import { createClient, Provider } from "urql";
+import type { LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
+import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from "@remix-run/react";
+import { json } from "@remix-run/node";
+import * as gtag from "~/utils/gtags.client";
 
 import styles from "./tailwind.css";
+import { useEffect } from "react";
 
-const client = createClient({
-    url: "https://jltalrmvohjgwsnyvvkp.supabase.co/graphql/v1",
-    fetchOptions: {
-        headers: {
-            apiKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpsdGFscm12b2hqZ3dzbnl2dmtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTg4OTI0MzYsImV4cCI6MTk3NDQ2ODQzNn0.90fooS4JlBnNs3LEo2ywG-PP1T9-YMCaZ4JhPom3Cw8",
-        },
-    },
-});
+type LoaderData = {
+    gaTrackingId: string | undefined;
+};
+
+export const loader: LoaderFunction = async () => {
+    return json<LoaderData>({ gaTrackingId: process.env.GA_TRACKING_ID });
+};
 
 export const meta: MetaFunction = () => ({
     charset: "utf-8",
@@ -24,6 +25,13 @@ export const links: LinksFunction = () => {
 };
 
 export default function App() {
+    const { gaTrackingId } = useLoaderData<LoaderData>();
+    useEffect(() => {
+        if (gaTrackingId?.length) {
+            gtag.pageview(location.pathname, gaTrackingId);
+        }
+    }, [gaTrackingId]);
+
     return (
         <html lang="en">
             <head>
@@ -31,12 +39,30 @@ export default function App() {
                 <Links />
             </head>
             <body className="bg-gray-100">
-                <Provider value={client}>
-                    <Outlet />
-                    <ScrollRestoration />
-                    <Scripts />
-                    <LiveReload />
-                </Provider>
+                {process.env.NODE_ENV === "development" || !gaTrackingId ? null : (
+                    <>
+                        <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaTrackingId}`} />
+                        <script
+                            async
+                            id="gtag-init"
+                            dangerouslySetInnerHTML={{
+                                __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${gaTrackingId}', {
+                  page_path: window.location.pathname,
+                });
+              `,
+                            }}
+                        />
+                    </>
+                )}
+
+                <Outlet />
+                <ScrollRestoration />
+                <Scripts />
+                <LiveReload />
             </body>
         </html>
     );
