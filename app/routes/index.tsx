@@ -26,9 +26,12 @@ const Fight: React.FC<{ fight: any }> = ({ fight }) => {
     };
 
     return (
-        <Popover className="relative" key={fight.id}>
+        <Popover className="relative">
             <div onMouseEnter={() => toggleMenu()} onMouseLeave={() => toggleMenu()} className="flex flex-col">
-                <Popover.Button className="bg-green-500 w-4 h-4"></Popover.Button>
+                <Popover.Button
+                    className="bg-green-500 w-4 h-4"
+                    aria-label={`Fight hover - ${dayjs(fight.created_at).format(dayFormat)}`}
+                ></Popover.Button>
                 <Transition
                     show={openState}
                     as={Fragment}
@@ -79,14 +82,14 @@ export default function Index() {
             <div className="mt-12 flex justify-center">
                 <div className="flex gap-1 w-1/2 flex-wrap">
                     {fights.map((fight) => (
-                        <Fight fight={fight} />
+                        <Fight fight={fight} key={fight.id} />
                         // <Tooltip message="test">
                         //     <div className="bg-green-500 w-4 h-4"></div>
                         // </Tooltip>
                     ))}
                 </div>
             </div>
-            <div className="text-center text-base text-gray-400 mt-12">Total fights: {count}</div>
+            <div className="text-center text-base text-gray-600 mt-12">Total fights: {count}</div>
         </div>
     );
 }

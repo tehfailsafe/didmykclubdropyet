@@ -18,6 +18,8 @@ export const meta: MetaFunction = () => ({
     charset: "utf-8",
     title: "Did My Kraken Club Drop Yet?",
     viewport: "width=device-width,initial-scale=1",
+    description: "How many runs will it take to drop a kclub?",
+    "og:description": "How many runs will it take to drop a kclub?",
 });
 
 export const links: LinksFunction = () => {
